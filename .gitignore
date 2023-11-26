@@ -1,0 +1,22 @@
+__pycache__/*
+*/__pycache__/*
+build/
+dist/
+*.egg-info/
+*.pyc
+.coverage
+.pypirc
+.idea/
+.vscode/
+build/
+*.html
+*.css
+*.png
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
