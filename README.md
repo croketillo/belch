@@ -19,7 +19,7 @@ BELCH Password List Generator is a simple tool to generate password lists based 
 To generate passwords, run the following command from anywhere on your system:
 
     ```bash 
-    belch
+    belch fds
     ```
 
 Follow the on-screen instructions to specify the password pattern and the number of passwords to generate.
