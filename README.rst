@@ -31,11 +31,10 @@ Usage
 To generate passwords, run the following command from anywhere on your
 system:
 
-::
+.. code:: bash
 
-   ```bash
    belch
-   ```
+
 
 Follow the on-screen instructions to specify the password pattern and
 the number of passwords to generate.
