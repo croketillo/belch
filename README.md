@@ -26,15 +26,11 @@ Follow the on-screen instructions to specify the password pattern and the number
 ## Password Patterns
 You can use the following characters in your pattern:
 
-[/d]: Digit
-
-[/c]: Lowercase
-
-[/C]: Uppercase
-
-[/e]: Special characters
-
-[/?]: Random characters
+- /d : Digit
+- /c : Lowercase
+- /C : Uppercase
+- /e: Special characters
+- /? : Random characters
 
 For example, the pattern [/C/c-pass-/d/?] will generate passwords with a combination of uppercase, lowercase, digits, and random characters in specified order.
 
