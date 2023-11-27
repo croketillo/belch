@@ -1,4 +1,4 @@
-"""BELCH Password list generator v0.1
+"""BELCH Password list generator v0.2
 
 Author: Croketillo <croketillo@gmail.com>
 
@@ -8,6 +8,7 @@ import random
 import string
 import time
 import os
+import sys
 from tqdm import tqdm
 from colorama import init,Style,Fore
 
@@ -109,53 +110,59 @@ def main():
     """Main function"""
     init(autoreset=True)
     print(Fore.YELLOW+"""
- ▄▄▄▄   ▓█████  ██▓     ▄████▄   ██░ ██ 
-▓█████▄ ▓█   ▀ ▓██▒    ▒██▀ ▀█  ▓██░ ██▒
-▒██▒ ▄██▒███   ▒██░    ▒▓█    ▄ ▒██▀▀██░
-▒██░█▀  ▒▓█  ▄ ▒██░    ▒▓▓▄ ▄██▒░▓█ ░██ 
-░▓█  ▀█▓░▒████▒░██████▒▒ ▓███▀ ░░▓█▒░██▓
-░▒▓███▀▒░░ ▒░ ░░ ▒░▓  ░░ ░▒ ▒  ░ ▒ ░░▒░▒
-▒░▒   ░  ░ ░  ░░ ░ ▒  ░  ░  ▒    ▒ ░▒░ ░
- ░    ░    ░     ░ ░   ░         ░  ░░ ░
- ░         ░  ░    ░  ░░ ░       ░  ░  ░
-      ░                ░             """)
-    print(Fore.LIGHTBLACK_EX+"        Password List Generator    v 0.1 \n")
+     ▄▄▄▄   ▓█████  ██▓     ▄████▄   ██░ ██ 
+    ▓█████▄ ▓█   ▀ ▓██▒    ▒██▀ ▀█  ▓██░ ██▒
+    ▒██▒ ▄██▒███   ▒██░    ▒▓█    ▄ ▒██▀▀██░
+    ▒██░█▀  ▒▓█  ▄ ▒██░    ▒▓▓▄ ▄██▒░▓█ ░██ 
+    ░▓█  ▀█▓░▒████▒░██████▒▒ ▓███▀ ░░▓█▒░██▓
+    ░▒▓███▀▒░░ ▒░ ░░ ▒░▓  ░░ ░▒ ▒  ░ ▒ ░░▒░▒
+    ▒░▒   ░  ░ ░  ░░ ░ ▒  ░  ░  ▒    ▒ ░▒░ ░
+     ░    ░    ░     ░ ░   ░         ░  ░░ ░
+     ░         ░  ░    ░  ░░ ░       ░  ░  ░
+          ░                ░             """)
+    print(Fore.LIGHTBLACK_EX+"        Password List Generator    v 0.2")
+    print(Fore.LIGHTBLACK_EX+"              [Ctrl + c] to EXIT \n")
     print(Style.BRIGHT+"TO SET PATTERN:")
     print("""
-    [/d] - Digit
-    [/c] - Lowecase 
-    [/C] - Uppercase
-    [/e] - Special characters
-    [/?] - Random characters
+    [ /d ] - Digit
+    [ /c ] - Lowecase 
+    [ /C ] - Uppercase
+    [ /e ]- Special characters
+    [ /? ]- Random characters
     """)
     
-    user_input = input(">>> Enter pattern: ")
-    password_generator = PasswordGenerator(user_input)
+    try:
+        user_input = input(">>> Enter pattern: ")
+        password_generator = PasswordGenerator(user_input)
 
-    max_combinations = password_generator.calculate_combinations()
-    print(Style.DIM+f"(The maximum number of possible combinations is: {max_combinations})")
+        max_combinations = password_generator.calculate_combinations()
+        print(Style.DIM+f"(The maximum number of possible combinations is: {max_combinations})")
 
-    n_password = get_integer_input(f">>> Enter the number of passwords to generate (not greater than {max_combinations}): ", max_combinations)
+        n_password = get_integer_input(f">>> Enter the number of passwords to generate (not greater than {max_combinations}): ", max_combinations)
 
-    file_name = get_filename_input()
+        file_name = get_filename_input()
 
-    start_time = time.time()
-    with open(file_name, "w") as file:
-        passwords = password_generator.generate_multiple(n_password)
-        for generated_password in passwords:
-            file.write(generated_password + "\n")
-    end_time = time.time()
-    original_duration = end_time - start_time
+        start_time = time.time()
+        with open(file_name, "w") as file:
+            passwords = password_generator.generate_multiple(n_password)
+            for generated_password in passwords:
+                file.write(generated_password + "\n")
+        end_time = time.time()
+        original_duration = end_time - start_time
 
-    if original_duration > 60:
-        minutes, seconds = divmod(original_duration, 60)
-        if minutes > 60:
-            hours, minutes = divmod(minutes, 60)
-            print(f"Passwords generated and stored in the file '{file_name}' in {int(hours)} hours, {int(minutes)} minutes, and {seconds:.2f} seconds.")
+        if original_duration > 60:
+            minutes, seconds = divmod(original_duration, 60)
+            if minutes > 60:
+                hours, minutes = divmod(minutes, 60)
+                print(f"Passwords generated and stored in the file '{file_name}' in {int(hours)} hours, {int(minutes)} minutes, and {seconds:.2f} seconds.")
+            else:
+                print(f"Passwords generated and stored in the file '{file_name}' in {int(minutes)} minutes and {seconds:.2f} seconds.")
         else:
-            print(f"Passwords generated and stored in the file '{file_name}' in {int(minutes)} minutes and {seconds:.2f} seconds.")
-    else:
-        print(f"Passwords generated and stored in the file '{file_name}' in {original_duration:.2f} seconds.")
+            print(f"Passwords generated and stored in the file '{file_name}' in {original_duration:.2f} seconds.")
+    except KeyboardInterrupt:
+        print(Fore.RED+"\n\n\tExit by user. Bye!")
+        sys.exit(0)
+
 
 if __name__ == "__main__":
     main()
