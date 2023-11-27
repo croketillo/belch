@@ -120,15 +120,15 @@ def main():
      ░    ░    ░     ░ ░   ░         ░  ░░ ░
      ░         ░  ░    ░  ░░ ░       ░  ░  ░
           ░                ░             """)
-    print(Fore.LIGHTBLACK_EX+"        Password List Generator    v 0.2")
+    print(Fore.LIGHTBLACK_EX+"        Password List Generator   v 0.2.2")
     print(Fore.LIGHTBLACK_EX+"              [Ctrl + c] to EXIT \n")
     print(Style.BRIGHT+"TO SET PATTERN:")
     print("""
     [ /d ] - Digit
     [ /c ] - Lowecase 
     [ /C ] - Uppercase
-    [ /e ]- Special characters
-    [ /? ]- Random characters
+    [ /e ] - Special characters
+    [ /? ] - Random characters
     """)
     
     try:
