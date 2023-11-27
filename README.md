@@ -1,7 +1,7 @@
 # BELCH Password List Generator
 
 ![PyPI - Version](https://img.shields.io/pypi/v/belch) ![GitHub License](https://img.shields.io/github/license/croketillo/belch) 
-![Pepy Total Downlods](https://img.shields.io/pepy/dt/bech) ![PyPI - Downloads](https://img.shields.io/pypi/dm/bech) 
+![Downloads](https://static.pepy.tech/badge/belch) ![PyPI - Downloads](https://img.shields.io/pypi/dm/bech) 
 
 ## Description
 BELCH Password List Generator is a simple tool to generate password lists based on a given pattern. You can specify the password pattern and generate multiple unique passwords.
