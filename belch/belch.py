@@ -1,4 +1,4 @@
-"""BELCH Password list generator v0.3
+"""BELCH Password list generator v0.3.2
 
 Author: Croketillo <croketillo@gmail.com>
 
