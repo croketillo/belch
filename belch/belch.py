@@ -32,9 +32,9 @@ class PasswordGenerator:
                 elif token == "d":
                     result += random.choice(string.digits)
                 elif token == "e":
-                    result += random.choice("!@#$%^&*(),.?\":{}|<>")
+                    result += random.choice("!@#$%^&*(),.?\":{}|<>_-+/;:[]")
                 elif token == "?":
-                    result += random.choice(string.ascii_letters + string.digits + "!@#$%^&*(),.?\":{}|<>")
+                    result += random.choice(string.ascii_letters + string.digits + "!@#$%^&*(),.?\":{}|<>_-+/;:[]")
                 else:
                     result += char + token
             else:
@@ -75,7 +75,7 @@ class PasswordGenerator:
                 elif control_char == "d":
                     total_combinations *= len(string.digits) ** repeat_factor
                 elif control_char in ("e", "?"):
-                    total_combinations *= len("!@#$%^&*(),.?\":{}|<>_-+/\\;:[]") ** repeat_factor
+                    total_combinations *= len("!@#$%^&*(),.?\":{}|<>_-+/;:[]") ** repeat_factor
             else:
                 total_combinations *= 1  # No control character, multiply by 1
             i += 1
@@ -120,7 +120,7 @@ def main():
      ░    ░    ░     ░ ░   ░         ░  ░░ ░
      ░         ░  ░    ░  ░░ ░       ░  ░  ░
           ░                ░             """)
-    print(Fore.LIGHTBLACK_EX+"        Password List Generator   v 0.3")
+    print(Fore.LIGHTBLACK_EX+"        Password List Generator   v 0.3.1")
     print(Fore.LIGHTBLACK_EX+"              [Ctrl + c] to EXIT \n")
     print(Style.BRIGHT+"TO SET PATTERN:")
     print("""
