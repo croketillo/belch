@@ -1,4 +1,4 @@
-"""BELCH Password list generator v0.2
+"""BELCH Password list generator v0.3
 
 Author: Croketillo <croketillo@gmail.com>
 
@@ -75,7 +75,7 @@ class PasswordGenerator:
                 elif control_char == "d":
                     total_combinations *= len(string.digits) ** repeat_factor
                 elif control_char in ("e", "?"):
-                    total_combinations *= len("!@#$%^&*(),.?\":{}|<>") ** repeat_factor
+                    total_combinations *= len("!@#$%^&*(),.?\":{}|<>_-+/\\;:[]") ** repeat_factor
             else:
                 total_combinations *= 1  # No control character, multiply by 1
             i += 1
@@ -109,7 +109,7 @@ def get_filename_input():
 def main():
     """Main function"""
     init(autoreset=True)
-    print(Fore.YELLOW+"""
+    print(Fore.GREEN+"""
      ▄▄▄▄   ▓█████  ██▓     ▄████▄   ██░ ██ 
     ▓█████▄ ▓█   ▀ ▓██▒    ▒██▀ ▀█  ▓██░ ██▒
     ▒██▒ ▄██▒███   ▒██░    ▒▓█    ▄ ▒██▀▀██░
@@ -120,7 +120,7 @@ def main():
      ░    ░    ░     ░ ░   ░         ░  ░░ ░
      ░         ░  ░    ░  ░░ ░       ░  ░  ░
           ░                ░             """)
-    print(Fore.LIGHTBLACK_EX+"        Password List Generator   v 0.2.2")
+    print(Fore.LIGHTBLACK_EX+"        Password List Generator   v 0.3")
     print(Fore.LIGHTBLACK_EX+"              [Ctrl + c] to EXIT \n")
     print(Style.BRIGHT+"TO SET PATTERN:")
     print("""
