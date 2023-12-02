@@ -11,7 +11,7 @@ dist/
 build/
 *.html
 *.css
-*.png
+
 
 # Environments
 .env
