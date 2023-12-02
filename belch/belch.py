@@ -1,4 +1,4 @@
-"""BELCH Password list generator v0.3.2
+"""BELCH Password list generator v0.3.3
 
 Author: Croketillo <croketillo@gmail.com>
 
@@ -32,9 +32,9 @@ class PasswordGenerator:
                 elif token == "d":
                     result += random.choice(string.digits)
                 elif token == "e":
-                    result += random.choice("!@#$%^&*(),.?\":{}|<>_-+/;:[]")
+                    result += random.choice("!@#$%^&*(),.?\":{}|<>_-+/;[]")
                 elif token == "?":
-                    result += random.choice(string.ascii_letters + string.digits + "!@#$%^&*(),.?\":{}|<>_-+/;:[]")
+                    result += random.choice(string.ascii_letters + string.digits + "!@#$%^&*(),.?\":{}|<>_-+/;[]")
                 else:
                     result += char + token
             else:
@@ -75,7 +75,7 @@ class PasswordGenerator:
                 elif control_char == "d":
                     total_combinations *= len(string.digits) ** repeat_factor
                 elif control_char in ("e", "?"):
-                    total_combinations *= len("!@#$%^&*(),.?\":{}|<>_-+/;:[]") ** repeat_factor
+                    total_combinations *= len("!@#$%^&*(),.?\":{}|<>_-+/;[]") ** repeat_factor
             else:
                 total_combinations *= 1  # No control character, multiply by 1
             i += 1
@@ -85,13 +85,18 @@ class PasswordGenerator:
 def get_integer_input(prompt, max_value):
     """Gets an integer input from the user."""
     while True:
-        try:
-            value = int(input(prompt))
-            if 0 < value <= max_value:
-                return value
-            print(f"Please enter a number between 1 and {max_value}.")
-        except ValueError:
-            print("Invalid input. Please enter a number.")
+        value = input(prompt)
+        if value:
+            try:
+                value=int(value) 
+                if 0 < value <= max_value:
+                    return value
+                print(f"Please enter a number between 1 and {max_value}.")
+            except ValueError:
+                        print("Invalid input. Please enter a number.")
+        else: 
+            value=int(max_value)
+            return value
 
 def get_filename_input():
     """Gets the name of the user's file"""
@@ -120,7 +125,7 @@ def main():
      ░    ░    ░     ░ ░   ░         ░  ░░ ░
      ░         ░  ░    ░  ░░ ░       ░  ░  ░
           ░                ░             """)
-    print(Fore.LIGHTBLACK_EX+"        Password List Generator   v 0.3.1")
+    print(Fore.LIGHTBLACK_EX+"        Password List Generator   v 0.3.3")
     print(Fore.LIGHTBLACK_EX+"              [Ctrl + c] to EXIT \n")
     print(Style.BRIGHT+"TO SET PATTERN:")
     print("""
@@ -138,7 +143,7 @@ def main():
         max_combinations = password_generator.calculate_combinations()
         print(Style.DIM+f"(The maximum number of possible combinations is: {max_combinations})")
 
-        n_password = get_integer_input(f">>> Enter the number of passwords to generate (not greater than {max_combinations}): ", max_combinations)
+        n_password = get_integer_input(f">>> Enter the number of passwords to generate (Enter for default: {max_combinations}): ", max_combinations)
 
         file_name = get_filename_input()
 

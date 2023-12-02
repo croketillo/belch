@@ -5,9 +5,6 @@ from sys import version_info
 
 CURR_PATH = "{}{}".format(path.abspath(path.dirname(__file__)), '/')
 
-
-
-
 def path_format(file_path=None, file_name=None, is_abspath=False,
                 ignore_raises=False):
     """
@@ -85,7 +82,7 @@ def read(file_name=None, is_encoding=True, ignore_raises=False):
 
 setup(
     name='belch',
-    version='0.3.2',
+    version='0.3.3',
     description='Password list generator',
     long_description=read("README.rst"),
     url='https://github.com/croketillo/belch',
