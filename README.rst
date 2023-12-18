@@ -7,6 +7,8 @@ BELCH Password List Generator
 .. image:: https://img.shields.io/pepy/dt/belch
    :alt: Pepy Total Downlods
 
+.. image:: https://github.com/croketillo/belch/blob/master/images/belch.png
+   :alt: Belch
 
 Description
 -----------

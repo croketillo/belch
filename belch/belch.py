@@ -114,7 +114,7 @@ def get_filename_input():
 def main():
     """Main function"""
     init(autoreset=True)
-    print(Fore.GREEN+"""
+    print(Fore.LIGHTMAGENTA_EX+"""
      ▄▄▄▄   ▓█████  ██▓     ▄████▄   ██░ ██ 
     ▓█████▄ ▓█   ▀ ▓██▒    ▒██▀ ▀█  ▓██░ ██▒
     ▒██▒ ▄██▒███   ▒██░    ▒▓█    ▄ ▒██▀▀██░
@@ -125,16 +125,26 @@ def main():
      ░    ░    ░     ░ ░   ░         ░  ░░ ░
      ░         ░  ░    ░  ░░ ░       ░  ░  ░
           ░                ░             """)
-    print(Fore.LIGHTBLACK_EX+"        Password List Generator   v 0.3.3")
+    print(Fore.LIGHTBLACK_EX+"        Password List Generator   v 0.3.4")
     print(Fore.LIGHTBLACK_EX+"              [Ctrl + c] to EXIT \n")
     print(Style.BRIGHT+"TO SET PATTERN:")
-    print("""
-    [ /d ] - Digit
-    [ /c ] - Lowecase 
-    [ /C ] - Uppercase
-    [ /e ] - Special characters
-    [ /? ] - Random characters
-    """)
+    
+    from rich.console import Console
+    from rich.table import Table
+
+
+    table = Table(title="Comandos")
+    table.add_column("Pattern command", style="cyan", justify="center")
+    table.add_column("Descripción", style="magenta")
+    table.add_row("/d", "Digit")
+    table.add_row("/c", "Lowercase")
+    table.add_row("/C", "Uppercase")
+    table.add_row("/e", "Special characters")
+    table.add_row("/?", "Random characters")
+    
+    console = Console()
+    console.print(table)
+    
     
     try:
         user_input = input(">>> Enter pattern: ")
