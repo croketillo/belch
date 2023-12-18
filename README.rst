@@ -1,14 +1,12 @@
 BELCH Password List Generator
 =============================
 
-.. image:: https://img.shields.io/pypi/v/belch
-   :alt: PyPI - Version
+|PyPI - Version| |GitHub License| |Pepy Total Downlods|
 
-.. image:: https://img.shields.io/pepy/dt/belch
-   :alt: Pepy Total Downlods
-
-.. image:: https://github.com/croketillo/belch/blob/master/images/belch.png
+.. figure:: https://github.com/croketillo/belch/blob/master/images/belch.png
    :alt: Belch
+
+   Belch
 
 Description
 -----------
@@ -33,10 +31,9 @@ Usage
 To generate passwords, run the following command from anywhere on your
 system:
 
-.. code:: bash
+::
 
-   belch
-
+   belch 
 
 Follow the on-screen instructions to specify the password pattern and
 the number of passwords to generate.
@@ -45,6 +42,12 @@ Password Patterns
 -----------------
 
 You can use the following characters in your pattern:
+
+-  /d : Digit
+-  /c : Lowercase
+-  /C : Uppercase
+-  /e: Special characters
+-  /? : Random characters
 
 For example, the pattern [/C/c-pass-/d/?] will generate passwords with a
 combination of uppercase, lowercase, digits, and random characters in
@@ -58,5 +61,4 @@ for more details.
 
 .. |PyPI - Version| image:: https://img.shields.io/pypi/v/belch
 .. |GitHub License| image:: https://img.shields.io/github/license/croketillo/belch
-.. |Pepy Total Downlods| image:: https://img.shields.io/pepy/dt/bech
-.. |PyPI - Downloads| image:: https://img.shields.io/pypi/dm/bech
+.. |Pepy Total Downlods| image:: https://img.shields.io/pepy/dt/belch

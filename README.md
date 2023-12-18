@@ -1,7 +1,7 @@
 # BELCH Password List Generator
 
 ![PyPI - Version](https://img.shields.io/pypi/v/belch) ![GitHub License](https://img.shields.io/github/license/croketillo/belch) 
-![Downloads](https://static.pepy.tech/badge/belch) 
+![Pepy Total Downlods](https://img.shields.io/pepy/dt/belch)
 
 ![Belch](/images/belch.png)
 
