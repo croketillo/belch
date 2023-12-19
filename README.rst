@@ -3,10 +3,6 @@ BELCH Password List Generator
 
 |PyPI - Version| |GitHub License| |Pepy Total Downlods|
 
-.. figure:: https://github.com/croketillo/belch/blob/master/images/belch.png
-   :alt: Belch
-
-   Belch
 
 Description
 -----------

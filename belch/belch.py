@@ -1,4 +1,4 @@
-"""BELCH Password list generator v0.3.3
+"""BELCH Password list generator v0.3.5
 
 Author: Croketillo <croketillo@gmail.com>
 
@@ -125,7 +125,7 @@ def main():
      ░    ░    ░     ░ ░   ░         ░  ░░ ░
      ░         ░  ░    ░  ░░ ░       ░  ░  ░
           ░                ░             """)
-    print(Fore.LIGHTBLACK_EX+"        Password List Generator   v 0.3.4")
+    print(Fore.LIGHTBLACK_EX+"        Password List Generator   v 0.3.6")
     print(Fore.LIGHTBLACK_EX+"              [Ctrl + c] to EXIT \n")
     print(Style.BRIGHT+"TO SET PATTERN:")
     
