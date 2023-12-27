@@ -82,7 +82,7 @@ def read(file_name=None, is_encoding=True, ignore_raises=False):
 
 setup(
     name='belch',
-    version='0.3.7',
+    version='0.3.8',
     description='Password list generator',
     long_description=read("README.rst"),
     url='https://github.com/croketillo/belch',

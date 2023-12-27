@@ -143,9 +143,9 @@ def main():
     from rich.table import Table
 
 
-    table = Table(title="Comandos")
+    table = Table()
     table.add_column("Pattern command", style="cyan", justify="center")
-    table.add_column("Descripción", style="magenta")
+    table.add_column("Description", style="magenta")
     table.add_row("/d", "Digit")
     table.add_row("/c", "Lowercase")
     table.add_row("/C", "Uppercase")
