@@ -1,4 +1,5 @@
-"""BELCH Password list generator v0.3.5
+#!/usr/bin/env python3
+"""BELCH Password list generator v0.3.10
 
 Author: Croketillo <croketillo@gmail.com>
 
@@ -110,10 +111,8 @@ def get_filename_input():
         return os.path.join(current_directory, user_input)
     else:
         return default_path
-
-def main():
-    """Main function"""
-    init(autoreset=True)
+    
+def show_logo():
     print(Fore.LIGHTMAGENTA_EX+"""
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @@@@@@@                     *%@@@@@@@@@@
@@ -135,7 +134,12 @@ def main():
 @@@@@@@@@%%%%%%%%%%%%%%%%%%%%%%%@@@@@@@@
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@""")
-    print(Fore.LIGHTBLACK_EX+"    Password List Generator   v 0.3.7")
+
+def main():
+    """Main function"""
+    init(autoreset=True)
+    show_logo()
+    print(Fore.LIGHTBLACK_EX+"    Password List Generator   v 0.3.10")
     print(Fore.LIGHTBLACK_EX+"          [Ctrl + c] to EXIT \n")
     print(Style.BRIGHT+"TO SET PATTERN:")
     
