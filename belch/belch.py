@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""BELCH Password list generator v0.3.10
+"""BELCH Password list generator v0.3.11
 
 Author: Croketillo <croketillo@gmail.com>
 
@@ -105,7 +105,7 @@ def get_filename_input():
     default_filename = "passlist.txt"
     default_path = os.path.join(current_directory, default_filename)
 
-    user_input = input(f">>> Enter the file name (or press Enter to default): ").strip()
+    user_input = input(f">>> Enter the file name (or press Enter to passlist.txt): ").strip()
 
     if user_input:
         return os.path.join(current_directory, user_input)
@@ -139,7 +139,7 @@ def main():
     """Main function"""
     init(autoreset=True)
     show_logo()
-    print(Fore.LIGHTBLACK_EX+"    Password List Generator   v 0.3.10")
+    print(Fore.LIGHTBLACK_EX+"    Password List Generator   v 0.3.11")
     print(Fore.LIGHTBLACK_EX+"          [Ctrl + c] to EXIT \n")
     print(Style.BRIGHT+"TO SET PATTERN:")
     
@@ -189,7 +189,7 @@ def main():
         else:
             print(f"Passwords generated and stored in the file '{file_name}' in {original_duration:.2f} seconds.")
     except KeyboardInterrupt:
-        print(Fore.RED+"\n\n\tExit by user. Bye!")
+        print(Fore.LIGHTRED_EX+"\n\n\tExit by user. Bye!")
         sys.exit(0)
 
 
