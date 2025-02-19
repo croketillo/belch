@@ -3,7 +3,7 @@ import string
 import time
 import os
 import sys
-from tqdm import tqdm
+from tinyprogress import progress
 from colorama import init, Style, Fore
 
 class PasswordGenerator:
@@ -47,16 +47,15 @@ class PasswordGenerator:
     def generate_multiple(self, count):
         generated_passwords = set()
 
-        with tqdm(total=count, desc="Generating passwords", unit="passwords", ascii=" ░▒█") as pbar:
-            try:
-                while len(generated_passwords) < count:
+        try:
+            for _ in progress(range(count), task_name="Generating passwords"):
+                generated_password = self.generate_single()
+                while generated_password in generated_passwords:
                     generated_password = self.generate_single()
-                    if generated_password not in generated_passwords:
-                        generated_passwords.add(generated_password)
-                        pbar.update(1)
-            except KeyboardInterrupt:
-                pbar.close()
-                print(Fore.LIGHTRED_EX + "\n\n[!] "+Fore.RESET+"Generation interrupted by user. Saving generated passwords so far...")
+                generated_passwords.add(generated_password)
+
+        except KeyboardInterrupt:
+            print(Fore.LIGHTRED_EX + "\n\n[!] " + Fore.RESET + "Generation interrupted by user. Saving generated passwords so far...")
 
         return list(generated_passwords)
 
@@ -212,7 +211,7 @@ def main():
 
         file_weight=calculate_weight_from_length(max_combinations,nchar)
 
-        print(Style.DIM + f"["+Fore.YELLOW+"i"+Fore.RESET+"] The maximum number of possible combinations is: {max_combinations}. ({file_weight})")
+        print(Style.DIM + f"["+Fore.YELLOW+"i"+Fore.RESET+f"] The maximum number of possible combinations is: {max_combinations}. ({file_weight})")
 
         n_password = get_integer_input(f"["+Fore.LIGHTGREEN_EX+">"+Fore.RESET+f"] Enter the number of passwords to generate (Enter for default: {max_combinations}): ", max_combinations)
 
