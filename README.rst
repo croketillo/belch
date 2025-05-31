@@ -33,11 +33,15 @@ the number of passwords to generate.
 Password Patterns
 -----------------
 
-ou can use the following characters in your pattern:
+You can use the following characters in your pattern:
 
-/d : Digit /c : Lowercase /C : Uppercase /e : Special characters /? :
-Random characters /@ : Mixed uppercase and lowercase /& : Mixed
-uppercase, lowercase, and digits
+/d : Digit 
+/c : Lowercase 
+/C : Uppercase 
+/e : Special characters 
+/? : Random characters 
+/@ : Mixed uppercase and lowercase 
+/& : Mixed uppercase, lowercase, and digits
 
 For example, the pattern [/C/c-pass-/d/?] will generate passwords with a
 combination of uppercase, lowercase, digits, and random characters in
