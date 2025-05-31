@@ -1,247 +1,215 @@
+from pathlib import Path
 import random
 import string
-import time
-import os
 import sys
-from tinyprogress import progress
+import time
+from typing import List, Set, Tuple
 from colorama import init, Style, Fore
+from tinyprogress import progress
+
+
+SPECIAL_CHARACTERS = "!@#$%^&*(),.?\":{}|<>_-+/;[]"
+
 
 class PasswordGenerator:
-    """Generate passwords based on a pattern."""
-    
-    def __init__(self, pattern):
+    def __init__(self, pattern: str):
         self.pattern = pattern.strip()
 
-    def generate_single(self):
-        result = ""
+    def generate_single(self) -> str:
+        result = []
         i = 0
         while i < len(self.pattern):
             char = self.pattern[i]
             if char == "/" and i + 1 < len(self.pattern):
                 i += 1
                 token = self.pattern[i]
-                if token == "C":
-                    result += random.choice(string.ascii_uppercase)
-                elif token == "c":
-                    result += random.choice(string.ascii_lowercase)
-                elif token == "d":
-                    result += random.choice(string.digits)
-                elif token == "e":
-                    result += random.choice("!@#$%^&*(),.?\":{}|<>_-+/;[]")
-                elif token == "?":
-                    result += random.choice(string.ascii_letters + string.digits + "!@#$%^&*(),.?\":{}|<>_-+/;[]")
-                elif token == "@":
-                    result += random.choice(string.ascii_uppercase + string.ascii_lowercase)
-                elif token == "&":
-                    result += random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits)
-                else:
-                    result += "/" + token  # Handle unknown token by treating as literal
+                result.append(self._translate_token(token))
             else:
-                result += char
+                result.append(char)
             i += 1
-        return result
-    
-    def count_char(self,string):
-        return len(string)
+        return "".join(result)
 
-    def generate_multiple(self, count):
-        generated_passwords = set()
+    def _translate_token(self, token: str) -> str:
+        token_map = {
+            "C": string.ascii_uppercase,
+            "c": string.ascii_lowercase,
+            "d": string.digits,
+            "e": SPECIAL_CHARACTERS,
+            "?": string.ascii_letters + string.digits + SPECIAL_CHARACTERS,
+            "@": string.ascii_letters,
+            "&": string.ascii_letters + string.digits
+        }
+        return random.choice(token_map[token]) if token in token_map else "/" + token
 
+    def generate_multiple(self, count: int) -> List[str]:
+        max_possible = self.calculate_combinations()
+        if count > max_possible:
+            raise ValueError(f"Cannot generate {count} unique passwords. Max possible is {max_possible}.")
+
+        generated_passwords: Set[str] = set()
         try:
             for _ in progress(range(count), task_name="Generating passwords"):
-                generated_password = self.generate_single()
-                while generated_password in generated_passwords:
-                    generated_password = self.generate_single()
-                generated_passwords.add(generated_password)
-
+                password = self.generate_single()
+                while password in generated_passwords:
+                    password = self.generate_single()
+                generated_passwords.add(password)
         except KeyboardInterrupt:
-            print(Fore.LIGHTRED_EX + "\n\n[!] " + Fore.RESET + "Generation interrupted by user. Saving generated passwords so far...")
-
+            print(Fore.LIGHTRED_EX + "\n\n[!] " + Fore.RESET + "Interrupted. Saving progress...")
         return list(generated_passwords)
 
-    def calculate_combinations(self):
-        """Calculate the total combinations based on the pattern."""
-        total_combinations = 1
-
+    def calculate_combinations(self) -> int:
+        total = 1
         i = 0
         while i < len(self.pattern):
             char = self.pattern[i]
-            if char == "/":
-                if i + 1 >= len(self.pattern):
-                    total_combinations *= 1  # Interprets '/' at the end as a literal character
-                    break
+            if char == "/" and i + 1 < len(self.pattern):
                 i += 1
-                control_char = self.pattern[i]
-                repeat_factor = 1
-                while i + 1 < len(self.pattern) and self.pattern[i + 1] == control_char:
-                    repeat_factor += 1
+                control = self.pattern[i]
+                repeat = 1
+                while i + 1 < len(self.pattern) and self.pattern[i + 1] == control:
+                    repeat += 1
                     i += 1
-                if control_char == "C":
-                    total_combinations *= len(string.ascii_uppercase) ** repeat_factor
-                elif control_char == "c":
-                    total_combinations *= len(string.ascii_lowercase) ** repeat_factor
-                elif control_char == "d":
-                    total_combinations *= len(string.digits) ** repeat_factor
-                elif control_char == "e":
-                    total_combinations *= len("!@#$%^&*(),.?\":{}|<>_-+/;[]") ** repeat_factor
-                elif control_char == "?":
-                    total_combinations *= len(string.ascii_letters + string.digits + "!@#$%^&*(),.?\":{}|<>_-+/;[]") ** repeat_factor
-                elif control_char == "@":
-                    total_combinations *= len(string.ascii_uppercase + string.ascii_lowercase) ** repeat_factor
-                elif control_char == "&":
-                    total_combinations *= len(string.ascii_uppercase + string.ascii_lowercase + string.digits) ** repeat_factor
+                total *= self._token_combinations(control) ** repeat
             else:
-                total_combinations *= 1  # No control character, multiply by 1
+                total *= 1
             i += 1
+        return total
 
-        return total_combinations
+    def _token_combinations(self, token: str) -> int:
+        token_map = {
+            "C": len(string.ascii_uppercase),
+            "c": len(string.ascii_lowercase),
+            "d": len(string.digits),
+            "e": len(SPECIAL_CHARACTERS),
+            "?": len(string.ascii_letters + string.digits + SPECIAL_CHARACTERS),
+            "@": len(string.ascii_letters),
+            "&": len(string.ascii_letters + string.digits)
+        }
+        return token_map.get(token, 1)
 
-def get_integer_input(prompt, max_value):
-    """Gets an integer input from the user."""
+
+def get_integer_input(prompt: str, max_value: int) -> int:
     while True:
         try:
             value = input(prompt)
             if value:
-                try:
-                    value = int(value)
-                    if 0 < value <= max_value:
-                        return value
-                    print(Fore.LIGHTRED_EX + "[!] "+Fore.RESET+f"Please enter a number between 1 and {max_value}.")
-                except ValueError:
-                    print(Fore.LIGHTRED_EX + "[!] "+Fore.RESET+"Invalid input. Please enter a number." + Fore.RESET)
+                value = int(value)
+                if 0 < value <= max_value:
+                    return value
+                print(Fore.LIGHTRED_EX + "[!] " + Fore.RESET + f"Enter a number between 1 and {max_value}.")
             else:
                 return max_value
+        except ValueError:
+            print(Fore.LIGHTRED_EX + "[!] " + Fore.RESET + "Invalid input. Enter a valid number.")
         except KeyboardInterrupt:
-            print(Fore.LIGHTRED_EX + "\n\n[!] "+Fore.RESET+"Exit by user. Bye!")
+            print(Fore.LIGHTRED_EX + "\n\n[!] " + Fore.RESET + "Exiting. Bye!")
             sys.exit(0)
 
-def get_filename_input():
-    """Gets the name of the user's file."""
-    current_directory = os.getcwd()
-    default_filename = "passlist.txt"
-    default_path = os.path.join(current_directory, default_filename)
 
+def get_filename_input(default_name: str = "passlist.txt") -> str:
     try:
-        user_input = input("["+Fore.LIGHTGREEN_EX+">"+Fore.RESET+"]  Enter the file name (or press Enter to use passlist.txt): ").strip()
+        user_input = input(f"[{Fore.LIGHTGREEN_EX}>{Fore.RESET}] Enter filename (Enter = {default_name}): ").strip()
+        return str(Path(user_input).resolve()) if user_input else str(Path.cwd() / default_name)
     except KeyboardInterrupt:
-        print(Fore.LIGHTRED_EX + "\n\n[!] "+Fore.RESET+"Exit by user. Bye!")
+        print(Fore.LIGHTRED_EX + "\n\n[!] " + Fore.RESET + "Exiting. Bye!")
         sys.exit(0)
 
-    if user_input:
-        return os.path.join(current_directory, user_input)
-    else:
-        return default_path
-    
+
 def show_logo():
-    print(Style.BRIGHT+"\n\t\t   BELCH Password List Generator   v 0.4.0 \t")
-    print(Style.DIM+"\t\t\t\tBy Croketillo")
+    print(Style.BRIGHT + "\n\t\t   BELCH Password List Generator   v 0.5.0")
+    print(Style.DIM + "\t\t\t\tBy Croketillo")
     print("\t\t\t      [Ctrl + C] to EXIT \n")
 
-def print_columns(options, num_columns=2):
-    max_width = max(len(opt[0]) + len(opt[1]) + 3 for opt in options) + 2  # Calculate max width with some padding
-    wrapped_text = []
-    
+
+def print_columns(options: List[Tuple[str, str]], num_columns: int = 2):
+    max_width = max(len(k) + len(v) + 3 for k, v in options) + 2
     for i in range(0, len(options), num_columns):
         line = ""
         for j in range(num_columns):
             if i + j < len(options):
-                opt, desc = options[i + j]
-                text = f"{opt} - {desc}"
-                line += text.ljust(max_width)
-        wrapped_text.append(line)
-    
-    for line in wrapped_text:
+                k, v = options[i + j]
+                line += f"{k} - {v}".ljust(max_width)
         print(line)
 
-def calculate_weight_from_length(n_lines: int, length: int) -> str:
-    """
-    Calculates the weight of a string based on its length in characters and the number of lines, in bytes, megabytes, or gigabytes.
 
-    :param n_lines: The number of lines.
-    :param length: The length of the string in characters per line.
-    :return: The weight of the string in bytes, megabytes, or gigabytes.
-    """
-    # Calculate total weight in bytes, assuming each line ends with a newline character
-    weight_in_bytes = (length + 1) * n_lines  # +1 for newline character
-    weight_in_megabytes = weight_in_bytes / (1024 * 1024)
-    weight_in_gigabytes = weight_in_megabytes / 1024
+def calculate_weight(n_lines: int, line_length: int) -> str:
+    total_bytes = (line_length + 1) * n_lines
+    mb = total_bytes / (1024 * 1024)
+    gb = mb / 1024
+    if gb >= 1:
+        return f"{gb:.2f} GB"
+    elif mb >= 0.01:
+        return f"{mb:.2f} MB"
+    return f"{total_bytes} bytes"
 
-    if weight_in_gigabytes >= 1:
-        return f"{weight_in_gigabytes:.2f} GB"
-    elif weight_in_megabytes >= 0.01:
-        return f"{weight_in_megabytes:.2f} MB"
-    return f"{weight_in_bytes} bytes"
 
 def main():
-    """Main function."""
     init(autoreset=True)
     show_logo()
 
     options = [
-    ("/d", "Digit"),
-    ("/c", "Lowercase"),
-    ("/C", "Uppercase"),
-    ("/e", "Special characters"),
-    ("/?", "Random characters"),
-    ("/@", "Mixed uppercase and lowercase"),
-    ("/&", "Mixed uppercase, lowercase and digits")
+        ("/d", "Digit"),
+        ("/c", "Lowercase"),
+        ("/C", "Uppercase"),
+        ("/e", "Special characters"),
+        ("/?", "Random characters"),
+        ("/@", "Mixed upper/lower"),
+        ("/&", "Mixed upper/lower/digits")
     ]
-    
+
     print(Style.BRIGHT + "Available Patterns:")
     print_columns(options)
-    print("_"*80)
-    
+    print("_" * 80)
+
     while True:
         try:
-            user_input = input("\n["+Fore.LIGHTGREEN_EX+">"+Fore.RESET+"] Enter pattern: ").strip()
-            if not user_input or any(char.isspace() for char in user_input):
-                print(Fore.LIGHTRED_EX + "[!] "+Fore.RESET+"Invalid pattern. Pattern cannot be empty or contain spaces.")
+            pattern = input(f"[{Fore.LIGHTGREEN_EX}>{Fore.RESET}] Enter pattern: ").strip()
+            if not pattern or any(c.isspace() for c in pattern):
+                print(Fore.LIGHTRED_EX + "[!] " + Fore.RESET + "Invalid pattern. No spaces allowed.")
                 continue
-
-            password_generator = PasswordGenerator(user_input)
+            generator = PasswordGenerator(pattern)
             break
         except KeyboardInterrupt:
-            print(Fore.LIGHTRED_EX + "\n\n[!] "+Fore.RESET+"Exit by user. Bye!")
+            print(Fore.LIGHTRED_EX + "\n\n[!] " + Fore.RESET + "Exiting. Bye!")
             sys.exit(0)
 
     try:
-        max_combinations = password_generator.calculate_combinations()
-        look_n_char=password_generator.generate_single()
-        nchar=password_generator.count_char(look_n_char)
+        combinations = generator.calculate_combinations()
+        example = generator.generate_single()
+        weight = calculate_weight(combinations, len(example))
 
-        file_weight=calculate_weight_from_length(max_combinations,nchar)
+        print(Style.DIM + f"[{Fore.YELLOW}i{Fore.RESET}] Maximum combinations: {combinations} ({weight})")
 
-        print(Style.DIM + f"["+Fore.YELLOW+"i"+Fore.RESET+f"] The maximum number of possible combinations is: {max_combinations}. ({file_weight})")
+        count = get_integer_input(
+            f"[{Fore.LIGHTGREEN_EX}>{Fore.RESET}] Number of passwords to generate (default: {combinations}): ",
+            combinations
+        )
+        filename = get_filename_input()
 
-        n_password = get_integer_input(f"["+Fore.LIGHTGREEN_EX+">"+Fore.RESET+f"] Enter the number of passwords to generate (Enter for default: {max_combinations}): ", max_combinations)
+        print("_" * 80)
+        start = time.time()
+        passwords = generator.generate_multiple(count)
 
-        file_name = get_filename_input()
+        with open(filename, "w") as f:
+            for pwd in passwords:
+                f.write(pwd + "\n")
+        duration = time.time() - start
 
-        start_time = time.time()
-        print("_"*80)
-        generated_passwords = password_generator.generate_multiple(n_password)
-
-        with open(file_name, "w") as file:
-            for generated_password in generated_passwords:
-                file.write(generated_password + "\n")
-        end_time = time.time()
-        original_duration = end_time - start_time
-
-        if original_duration > 60:
-            minutes, seconds = divmod(original_duration, 60)
-            if minutes > 60:
-                hours, minutes = divmod(minutes, 60)
-                print("_"*80)
-                print(Fore.GREEN+f"\n\n[+] "+Fore.RESET+f"Passwords generated and stored in the file '{file_name}' in {int(hours)} hours, {int(minutes)} minutes, and {seconds:.2f} seconds.")
-            else:
-                print("_"*80)
-                print(Fore.GREEN+f"\n\n[+] "+Fore.RESET+f"Passwords generated and stored in the file '{file_name}' in {int(minutes)} minutes and {seconds:.2f} seconds.")
+        print("_" * 80)
+        if duration > 3600:
+            h, rem = divmod(duration, 3600)
+            m, s = divmod(rem, 60)
+            print(Fore.GREEN + f"\n\n[+] " + Fore.RESET + f"Saved to '{filename}' in {int(h)}h {int(m)}m {s:.2f}s.")
+        elif duration > 60:
+            m, s = divmod(duration, 60)
+            print(Fore.GREEN + f"\n\n[+] " + Fore.RESET + f"Saved to '{filename}' in {int(m)}m {s:.2f}s.")
         else:
-            print("_"*80)
-            print(Fore.GREEN+"\n\n[+] "+Fore.RESET+f"Passwords generated and stored in the file '{file_name}' in {original_duration:.2f} seconds.")
+            print(Fore.GREEN + f"\n\n[+] " + Fore.RESET + f"Saved to '{filename}' in {duration:.2f}s.")
+
     except KeyboardInterrupt:
-        print(Fore.LIGHTRED_EX + "\n\n[!] "+Fore.RESET+"Exit by user. Bye!")
+        print(Fore.LIGHTRED_EX + "\n\n[!] " + Fore.RESET + "Exiting. Bye!")
         sys.exit(0)
+
 
 if __name__ == "__main__":
     main()
