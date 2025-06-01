@@ -1,0 +1,2 @@
+[console_scripts]
+belch = belch.belch:main
