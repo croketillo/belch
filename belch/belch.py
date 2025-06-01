@@ -116,7 +116,7 @@ def get_filename_input(default_name: str = "passlist.txt") -> str:
 
 
 def show_logo():
-    print(Style.BRIGHT + "\n\t\t   BELCH Password List Generator   v 1.1.1")
+    print(Style.BRIGHT + "\n\t\t   BELCH Password List Generator   v 1.1.2")
     print(Style.DIM + "\t\t\t\tBy Croketillo")
     print("\t\t\t      [Ctrl + C] to EXIT \n")
 
