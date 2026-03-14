@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "belch"
+version = "2.0.0"
+description = "Password list generator"
+readme = { file = "README.rst", content-type = "text/x-rst" }
+license = { file = "LICENSE" }
+authors = [
+    { name = "croketillo", email = "croketillo@gmail.com" }
+]
+keywords = ["password", "password generator"]
+requires-python = ">=3.10"
+dependencies = [
+    "tinyprogress",
+    "colorama",
+]
+classifiers = [
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Other Audience",
+    "Intended Audience :: Telecommunications Industry",
+    "Intended Audience :: System Administrators",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Terminals",
+    "Topic :: Security",
+    "Topic :: Utilities",
+]
+
+[project.urls]
+Homepage = "https://github.com/croketillo/belch"
+Repository = "https://github.com/croketillo/belch"
+
+[project.scripts]
+belch = "belch.belch:main"
+
+[tool.setuptools.packages.find]
+where = ["."]

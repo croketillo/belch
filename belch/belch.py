@@ -10,41 +10,80 @@ from tinyprogress import progress
 
 SPECIAL_CHARACTERS = "!@#$%^&*(),.?\":{}|<>_-+/;[]"
 
+# Unified token map: token -> character pool
+# Both generation and combination count derive from this single source of truth.
+TOKEN_MAP: dict[str, str] = {
+    "C": string.ascii_uppercase,
+    "c": string.ascii_lowercase,
+    "d": string.digits,
+    "e": SPECIAL_CHARACTERS,
+    "?": string.ascii_letters + string.digits + SPECIAL_CHARACTERS,
+    "@": string.ascii_letters,
+    "&": string.ascii_letters + string.digits,
+}
+
+
+def _parse_pattern(pattern: str) -> List[str | None]:
+    """Parse a pattern string into a list of character pools or None for literals.
+
+    Each element is either:
+      - A string (the pool of characters to pick from for that position), or
+      - A single literal character (returned as a one-char string pool with
+        exactly that character, i.e. pool of size 1).
+    """
+    tokens: List[str] = []
+    i = 0
+    while i < len(pattern):
+        char = pattern[i]
+        if char == "/" and i + 1 < len(pattern):
+            i += 1
+            token = pattern[i]
+            if token in TOKEN_MAP:
+                tokens.append(TOKEN_MAP[token])
+            else:
+                # Unknown escape: treat as literal "/" + token
+                tokens.append("/" + token)
+        else:
+            tokens.append(char)  # literal character (pool of exactly 1)
+        i += 1
+    return tokens
+
 
 class PasswordGenerator:
+    """Generates passwords according to a pattern string.
+
+    Pattern tokens:
+        /d  Digit
+        /c  Lowercase letter
+        /C  Uppercase letter
+        /e  Special character
+        /?  Any printable character (letters + digits + special)
+        /@  Any letter (upper or lower)
+        /&  Any letter or digit
+    Any other character in the pattern is used as a literal.
+    """
+
     def __init__(self, pattern: str):
         self.pattern = pattern.strip()
+        # Parse once; reuse for both generation and combination count.
+        self._pools: List[str] = _parse_pattern(self.pattern)
 
     def generate_single(self) -> str:
-        result = []
-        i = 0
-        while i < len(self.pattern):
-            char = self.pattern[i]
-            if char == "/" and i + 1 < len(self.pattern):
-                i += 1
-                token = self.pattern[i]
-                result.append(self._translate_token(token))
-            else:
-                result.append(char)
-            i += 1
-        return "".join(result)
-
-    def _translate_token(self, token: str) -> str:
-        token_map = {
-            "C": string.ascii_uppercase,
-            "c": string.ascii_lowercase,
-            "d": string.digits,
-            "e": SPECIAL_CHARACTERS,
-            "?": string.ascii_letters + string.digits + SPECIAL_CHARACTERS,
-            "@": string.ascii_letters,
-            "&": string.ascii_letters + string.digits
-        }
-        return random.choice(token_map[token]) if token in token_map else "/" + token
+        """Generate a single password from the pattern."""
+        return "".join(random.choice(pool) for pool in self._pools)
 
     def generate_multiple(self, count: int) -> List[str]:
+        """Generate `count` unique passwords.
+
+        Uses a set for O(1) duplicate detection. For counts near the theoretical
+        maximum, the caller should be aware that generation may slow down.
+        """
         max_possible = self.calculate_combinations()
         if count > max_possible:
-            raise ValueError(f"Cannot generate {count} unique passwords. Max possible is {max_possible}.")
+            raise ValueError(
+                f"Cannot generate {count} unique passwords. "
+                f"Max possible is {max_possible}."
+            )
 
         generated_passwords: Set[str] = set()
         try:
@@ -58,37 +97,43 @@ class PasswordGenerator:
         return list(generated_passwords)
 
     def calculate_combinations(self) -> int:
+        """Return the number of unique passwords the pattern can produce."""
         total = 1
-        i = 0
-        while i < len(self.pattern):
-            char = self.pattern[i]
-            if char == "/" and i + 1 < len(self.pattern):
-                i += 1
-                control = self.pattern[i]
-                repeat = 1
-                while i + 1 < len(self.pattern) and self.pattern[i + 1] == control:
-                    repeat += 1
-                    i += 1
-                total *= self._token_combinations(control) ** repeat
-            else:
-                total *= 1
-            i += 1
+        for pool in self._pools:
+            total *= len(set(pool))  # use set() to deduplicate pool chars
         return total
 
-    def _token_combinations(self, token: str) -> int:
-        token_map = {
-            "C": len(string.ascii_uppercase),
-            "c": len(string.ascii_lowercase),
-            "d": len(string.digits),
-            "e": len(SPECIAL_CHARACTERS),
-            "?": len(string.ascii_letters + string.digits + SPECIAL_CHARACTERS),
-            "@": len(string.ascii_letters),
-            "&": len(string.ascii_letters + string.digits)
-        }
-        return token_map.get(token, 1)
+
+# ---------------------------------------------------------------------------
+# Helper utilities
+# ---------------------------------------------------------------------------
+
+def format_duration(seconds: float) -> str:
+    """Return a human-readable duration string."""
+    if seconds > 3600:
+        h, rem = divmod(seconds, 3600)
+        m, s = divmod(rem, 60)
+        return f"{int(h)}h {int(m)}m {s:.2f}s"
+    if seconds > 60:
+        m, s = divmod(seconds, 60)
+        return f"{int(m)}m {s:.2f}s"
+    return f"{seconds:.2f}s"
+
+
+def calculate_weight(n_lines: int, line_length: int) -> str:
+    """Return a human-readable file size estimate."""
+    total_bytes = (line_length + 1) * n_lines  # +1 for newline
+    mb = total_bytes / (1024 * 1024)
+    gb = mb / 1024
+    if gb >= 1:
+        return f"{gb:.2f} GB"
+    if mb >= 0.01:
+        return f"{mb:.2f} MB"
+    return f"{total_bytes} bytes"
 
 
 def get_integer_input(prompt: str, max_value: int) -> int:
+    """Prompt the user for an integer in [1, max_value]. Enter returns max_value."""
     while True:
         try:
             value = input(prompt)
@@ -107,8 +152,11 @@ def get_integer_input(prompt: str, max_value: int) -> int:
 
 
 def get_filename_input(default_name: str = "passlist.txt") -> str:
+    """Prompt the user for an output filename."""
     try:
-        user_input = input(f"[{Fore.LIGHTGREEN_EX}>{Fore.RESET}] Enter filename (Enter = {default_name}): ").strip()
+        user_input = input(
+            f"[{Fore.LIGHTGREEN_EX}>{Fore.RESET}] Enter filename (Enter = {default_name}): "
+        ).strip()
         return str(Path(user_input).resolve()) if user_input else str(Path.cwd() / default_name)
     except KeyboardInterrupt:
         print(Fore.LIGHTRED_EX + "\n\n[!] " + Fore.RESET + "Exiting. Bye!")
@@ -132,16 +180,9 @@ def print_columns(options: List[Tuple[str, str]], num_columns: int = 2):
         print(line)
 
 
-def calculate_weight(n_lines: int, line_length: int) -> str:
-    total_bytes = (line_length + 1) * n_lines
-    mb = total_bytes / (1024 * 1024)
-    gb = mb / 1024
-    if gb >= 1:
-        return f"{gb:.2f} GB"
-    elif mb >= 0.01:
-        return f"{mb:.2f} MB"
-    return f"{total_bytes} bytes"
-
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
 
 def main():
     init(autoreset=True)
@@ -154,7 +195,7 @@ def main():
         ("/e", "Special characters"),
         ("/?", "Random characters"),
         ("/@", "Mixed upper/lower"),
-        ("/&", "Mixed upper/lower/digits")
+        ("/&", "Mixed upper/lower/digits"),
     ]
 
     print(Style.BRIGHT + "Available Patterns:")
@@ -182,7 +223,7 @@ def main():
 
         count = get_integer_input(
             f"[{Fore.LIGHTGREEN_EX}>{Fore.RESET}] Number of passwords to generate (default: {combinations}): ",
-            combinations
+            combinations,
         )
         filename = get_filename_input()
 
@@ -190,21 +231,13 @@ def main():
         start = time.time()
         passwords = generator.generate_multiple(count)
 
+        # Single buffered write — much faster than one write per password.
         with open(filename, "w") as f:
-            for pwd in passwords:
-                f.write(pwd + "\n")
-        duration = time.time() - start
+            f.write("\n".join(passwords) + "\n")
 
+        duration = time.time() - start
         print("_" * 80)
-        if duration > 3600:
-            h, rem = divmod(duration, 3600)
-            m, s = divmod(rem, 60)
-            print(Fore.GREEN + f"\n\n[+] " + Fore.RESET + f"Saved to '{filename}' in {int(h)}h {int(m)}m {s:.2f}s.")
-        elif duration > 60:
-            m, s = divmod(duration, 60)
-            print(Fore.GREEN + f"\n\n[+] " + Fore.RESET + f"Saved to '{filename}' in {int(m)}m {s:.2f}s.")
-        else:
-            print(Fore.GREEN + f"\n\n[+] " + Fore.RESET + f"Saved to '{filename}' in {duration:.2f}s.")
+        print(Fore.GREEN + "\n\n[+] " + Fore.RESET + f"Saved to '{filename}' in {format_duration(duration)}.")
 
     except KeyboardInterrupt:
         print(Fore.LIGHTRED_EX + "\n\n[!] " + Fore.RESET + "Exiting. Bye!")
